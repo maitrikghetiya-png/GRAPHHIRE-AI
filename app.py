@@ -140,7 +140,7 @@ def main():
     # Execution State & Job Recommendations
     if find_jobs:
         if not selected_skills:
-            st.info("💡 Please
+            st.info("💡 Please select a student to see recommendations.")
 
 
 select at least one skill to match jobs.")
