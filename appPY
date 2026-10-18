@@ -1,0 +1,91 @@
+
+import streamlit as st
+from graph_engine import get_recommendations
+
+st.set_page_config(
+    page_title="GraphHire",
+    page_icon="🎯",
+    layout="wide"
+)
+
+st.title("🎯 GraphHire")
+st.subheader("AI-powered Student Career & Skill Recommendation")
+st.write("Discover suitable jobs and the skills you need to learn.")
+
+student_name = st.text_input("Enter student name", value="Asha")
+
+if st.button("Find My Opportunities", type="primary"):
+    if not student_name.strip():
+        st.warning("Please enter a student name.")
+    else:
+        try:
+            with st.spinner("Finding your opportunities..."):
+                result = get_recommendations(student_name.strip())
+
+            if result.get("error"):
+                st.error(result["error"])
+            else:
+                st.success(f"Recommendations for {result['student']}")
+
+                col1, col2, col3 = st.columns(3)
+                col1.metric("Current Skills", len(result["skills"]))
+                col2.metric("Matching Jobs", len(result["jobs"]))
+                col3.metric("Recommended Courses", len(result["courses"]))
+
+                st.header("🧠 Your Skills")
+                if result["skills"]:
+                    st.write(" · ".join(result["skills"]))
+                else:
+                    st.info("No skills have been recorded yet.")
+
+                st.header("💼 Recommended Jobs")
+                if result["jobs"]:
+                    for job in result["jobs"]:
+                        with st.container(border=True):
+                            st.subheader(job["title"])
+                            st.caption(job["company"])
+                            st.write(job["description"])
+                            st.progress(
+                                int(job["match_percent"]),
+                                text=f"Skill match: {job['match_percent']}%"
+                            )
+
+                            matched = job["matched_skills"]
+                            missing = job["missing_skills"]
+
+                            st.write("**Skills you have:**")
+                            st.write(
+                                ", ".join(matched) if matched else "None yet"
+                            )
+
+                            st.write("**Skills to develop:**")
+                            st.write(
+                                ", ".join(missing) if missing else "None"
+                            )
+                else:
+                    st.info("No matching jobs found.")
+
+                st.header("📚 Recommended Learning Courses")
+                if result["courses"]:
+                    for course in result["courses"]:
+                        with st.container(border=True):
+                            st.write(f"**{course['title']}**")
+                            st.caption(
+                                f"Provider: {course['provider']} | "
+                                f"Skill: {course['skill']}"
+                            )
+                else:
+                    st.info(
+                        "No courses recommended. You may already have "
+                        "the skills required for the listed jobs."
+                    )
+
+        except Exception as error:
+            st.error(
+                "Could not connect to the GraphHire backend. "
+                "Check the FalkorDB connection and configuration."
+            )
+            st.caption(f"Technical details: {error}")
+
+st.divider()
+st.caption("GraphHire | Powered by Python, Streamlit and FalkorDB")
