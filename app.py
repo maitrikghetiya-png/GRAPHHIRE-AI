@@ -144,7 +144,7 @@ def main():
 
 
 ("select at least one skill to match jobs.")
-            return
+return
 
         with st.spinner("Analyzing FalkorDB knowledge graph..."):
             try:
