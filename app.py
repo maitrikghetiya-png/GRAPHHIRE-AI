@@ -143,7 +143,7 @@ def main():
             st.info("💡 Please select a student to see recommendations.")
 
 
-select at least one skill to match jobs.")
+("select at least one skill to match jobs.")
             return
 
         with st.spinner("Analyzing FalkorDB knowledge graph..."):
